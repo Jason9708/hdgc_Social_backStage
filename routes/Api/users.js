@@ -19,6 +19,7 @@ router.get("/test", (req, res) => {
  *  - code: 信息码
  *  - data：数据
  *  - messgae：提示信息
+ * @表单验证由前端处理
  */
 router.post('/register', (req, res) => {
     // 1- 判断数据库是否已存在该用户名
