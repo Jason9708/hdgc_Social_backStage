@@ -11,3 +11,9 @@
 - users 表 - 用户信息
 - article 表 - 文章信息
 - comment 表 - 评论信息
+
+### 登录Api涉及技术栈
+- 密码采用`bcrypt`进行加密，并通过`bcrypt.compare`对加密后的密码进行解密匹配
+- 鉴权方案采用`jwt`
+    - `jsonwebtoken`生成`token`
+    - `passport`与`passport-jwt`解析`token`

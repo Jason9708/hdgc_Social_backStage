@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const bcrypt = require('bcryptjs') // 加密插件
+const jsonwebtoken = require('jsonwebtoken') // 生成 token
+const passport = require('passport') // 解析token
 const User = require('../../models/User') // 引入数据模型
 
 /**
@@ -68,6 +70,78 @@ router.post('/register', (req, res) => {
                 })
             })
         }
+    })
+})
+router.post('/login', (req, res) => {
+        const username = req.body.username
+        const password = req.body.password
+            // 查询当前用户是否存在
+        User.findOne({
+            username: username
+        }).then((user) => {
+            if (!user) {
+                return res.json({
+                    code: '-1',
+                    message: '当前用户未注册'
+                })
+            }
+            // 使用bcrypt对加密密码进行解密匹配
+            bcrypt.compare(password, user.password).then(isMatch => {
+                if (isMatch) {
+                    // 匹配成功
+                    const rule = {
+                            id: user.id,
+                            username: user.username
+                        }
+                        /**
+                         * jsonwebtoken 参数意义
+                         * @规则
+                         * @加密名字
+                         * @过期时间
+                         * @箭头函数
+                         */
+                    jsonwebtoken.sign(rule, 'secretKey', { expiresIn: 3600 }, (err, token) => {
+                        if (err) {
+                            // token生成异常捕获
+                            res.json({
+                                code: '-1',
+                                message: `token生成异常捕获：${err}`
+                            })
+                            return
+                        }
+                        res.json({
+                            code: '0',
+                            data: user,
+                            token: 'Bearer ' + token, // 必须在前面加上 'Bearer '
+                            message: 'Login successful'
+                        })
+                    })
+                } else {
+                    // 匹配失败
+                    return res.json({
+                        code: '-1',
+                        message: '用户名或密码错误'
+                    })
+                }
+            })
+        })
+    })
+    /**
+     * 使用 Restful 风格 获取和修改当前用户信息
+     * @get 获取用户信息
+     * @post 修改用户信息
+     * @json
+     *  - code: 信息码
+     *  - data：数据
+     *  - messgae：提示信息
+     * @表单验证由前端处理
+     */
+router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => {
+    req.user.password = '******' // user 为 passport 执行 done() 所传入的信息，注意password不能明文出现
+    res.json({
+        code: '0',
+        data: req.user,
+        message: 'success'
     })
 })
 

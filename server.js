@@ -3,13 +3,14 @@ const app = express() // 实例化 express
 const mongoose = require('mongoose') // 引入 mongoose
 const db = require('./config/mongokey.js').mongoURI // 引入 数据库路径
 const bodyParser = require('body-parser') // 引入 body-parser 作用：处理 post 请求
+const passport = require('passport') // 作用：解析token
 
 const port = process.env.PORT || 5000 // 设置端口号，本地为5000
 
 // 测试
-app.get('/', (req, res) => {
-    res.send('Test,please ignore!')
-})
+// app.get('/', (req, res) => {
+//     res.send('Test,please ignore!')
+// })
 
 // 连接数据库
 mongoose.connect(db).then(() => {
@@ -25,6 +26,10 @@ app.use(bodyParser.urlencoded({
     extended: false
 }))
 app.use(bodyParser.json())
+
+// 初始化 passport
+app.use(passport.initialize())
+require('./config/passport')(passport)
 
 /**
  * 引入路由表 & 使用路由

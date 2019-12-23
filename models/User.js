@@ -27,31 +27,40 @@ const user_schema = new Schema({
         required: true
     },
     nickname: {
-        type: String
+        type: String,
+        default: ''
     },
     intro: {
-        type: String
+        type: String,
+        default: ''
     },
     profession: {
-        type: String
+        type: String,
+        default: ''
     },
     company: {
-        type: String
+        type: String,
+        default: ''
     },
     email: {
-        type: String
+        type: String,
+        default: ''
     },
     wechat: {
-        type: String
+        type: String,
+        default: ''
     },
     weibo: {
-        type: String
+        type: String,
+        default: ''
     },
     github: {
-        type: String
+        type: String,
+        default: ''
     },
     internet: {
-        type: String
+        type: String,
+        default: ''
     },
     date: {
         type: Date,
