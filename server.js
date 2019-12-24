@@ -13,13 +13,14 @@ const port = process.env.PORT || 5000 // 设置端口号，本地为5000
 // })
 
 // 连接数据库
-mongoose.connect(db).then(() => {
+mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
     // success
     console.log('Mongo Connect Successful')
 }).catch((e) => {
     // fail
     console.log('Mongo Connect fail')
 })
+mongoose.set('useFindAndModify', false) // 屏蔽useFindAndModify废弃警告
 
 // 使用 body-parser 中间件
 app.use(bodyParser.urlencoded({

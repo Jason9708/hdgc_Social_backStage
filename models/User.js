@@ -26,6 +26,10 @@ const user_schema = new Schema({
         type: String,
         required: true
     },
+    avatar: {
+        type: String,
+        default: 'default_avatar'
+    },
     nickname: {
         type: String,
         default: ''
