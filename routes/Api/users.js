@@ -24,12 +24,13 @@ router.get("/test", (req, res) => {
  * @表单验证由前端处理
  */
 router.post('/register', (req, res) => {
-    // 1- 判断数据库是否已存在该用户名
+    console.log(req.body)
+        // 1- 判断数据库是否已存在该用户名
     User.findOne({
         username: req.body.username
     }).then((user) => {
         if (user) {
-            return res.status(400).json({
+            return res.json({
                 code: '-1',
                 email: '用户名已存在'
             })
@@ -73,6 +74,7 @@ router.post('/register', (req, res) => {
     })
 })
 router.post('/login', (req, res) => {
+    console.log(req.body)
     const username = req.body.username
     const password = req.body.password
         // 查询当前用户是否存在
@@ -80,7 +82,7 @@ router.post('/login', (req, res) => {
         username: username
     }).then((user) => {
         if (!user) {
-            return res.status(400).json({
+            return res.json({
                 code: '-1',
                 message: '当前用户未注册'
             })
@@ -101,7 +103,7 @@ router.post('/login', (req, res) => {
                      * @箭头函数
                      * @返回token
                      */
-                jsonwebtoken.sign(rule, 'secretKey', { expiresIn: 3600 }, (err, token) => {
+                jsonwebtoken.sign(rule, 'secretKey', { expiresIn: 5 }, (err, token) => {
                     if (err) {
                         // token生成异常捕获
                         res.json({
@@ -119,7 +121,7 @@ router.post('/login', (req, res) => {
                 })
             } else {
                 // 匹配失败
-                return res.status(400).json({
+                return res.json({
                     code: '-1',
                     message: '用户名或密码错误'
                 })
@@ -145,7 +147,7 @@ router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => 
         username: req.user.username
     }).then((user) => {
         if (!user) {
-            return res.status(404).json({
+            return res.json({
                 code: '-1',
                 message: '用户信息不存在'
             })
@@ -175,7 +177,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
         username: req.user.username
     }).then((user) => {
         if (!user) {
-            return res.status(404).json({
+            return res.json({
                 code: '-1',
                 message: '用户信息不存在'
             })
