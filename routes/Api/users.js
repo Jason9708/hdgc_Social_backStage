@@ -103,7 +103,7 @@ router.post('/login', (req, res) => {
                      * @箭头函数
                      * @返回token
                      */
-                jsonwebtoken.sign(rule, 'secretKey', { expiresIn: 5 }, (err, token) => {
+                jsonwebtoken.sign(rule, 'secretKey', { expiresIn: 3600 }, (err, token) => {
                     if (err) {
                         // token生成异常捕获
                         res.json({
