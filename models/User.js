@@ -28,7 +28,7 @@ const user_schema = new Schema({
     },
     avatar: {
         type: String,
-        default: 'default_avatar'
+        default: ''
     },
     nickname: {
         type: String,

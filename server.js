@@ -9,7 +9,7 @@ const port = process.env.PORT || 5000 // 设置端口号，本地为5000
 
 // 测试
 // app.get('/', (req, res) => {
-//     res.send('Test,please ignore!')
+//     res.sendFile(__dirname + "/images/avatar/test.jpg");
 // })
 
 // 连接数据库
@@ -45,8 +45,9 @@ app.use((req, res, next) => {
  * @users 用户相关
  */
 const users = require('./routes/Api/users')
+const upload = require('./routes/Api/upload')
 app.use('/hdgc/users', users)
-
+app.use('/hdgc/upload', upload)
 
 app.listen(port, () => {
     console.log(`❤  Server running on port ${port} ❤`)
