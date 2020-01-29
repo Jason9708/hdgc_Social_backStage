@@ -46,8 +46,10 @@ app.use((req, res, next) => {
  */
 const users = require('./routes/Api/users')
 const upload = require('./routes/Api/upload')
+const article = require('./routes/Api/article')
 app.use('/hdgc/users', users)
 app.use('/hdgc/upload', upload)
+app.use('/hdgc/article', article)
 
 app.listen(port, () => {
     console.log(`❤  Server running on port ${port} ❤`)
