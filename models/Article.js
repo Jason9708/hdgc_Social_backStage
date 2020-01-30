@@ -39,19 +39,23 @@ const article_schema = new Schema({
     },
     title: {
         type: String,
-        default: ''
+        required: true,
     },
     classification: {
         type: String,
-        default: ''
+        required: true,
     },
     content: {
         type: String,
         required: true,
     },
+    intro: {
+        type: String,
+        required: true,
+    },
     mood: {
         type: String,
-        default: ''
+        required: true,
     },
     date: {
         type: Date,

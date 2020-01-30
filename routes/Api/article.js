@@ -17,8 +17,11 @@ const Article = require('../../models/Article') // 引入数据模型
  * 
  * 接受的必要参数
  * @createUserId 用户Id
- * @createUserInfo 用户信息
+ * @title 文章标题
+ * @classification 文章分类
+ * @intro 文章简介
  * @content 文章内容
+ * @mood 心情
  */
 router.post('/', passport.authenticate('jwt', { session: false }), upload.single('file'), (req, res) => {
     console.log(req.file)
@@ -64,8 +67,25 @@ router.post('/', passport.authenticate('jwt', { session: false }), upload.single
             title: req.body.title,
             content: req.body.content,
             classification: req.body.classification,
+            intro: req.body.intro,
             mood: req.body.mood,
         })
+
+        // 封面图存在 存入服务器
+        if (newArticle.coverPic) {
+            let file = req.file;
+            // 判断上传的图片格式
+            // mimetype：该文件的Mime type
+            if (file.mimetype == "image/jpeg") {
+                newArticle.coverPic += ".jpg";
+            }
+            if (file.mimetype == "image/png") {
+                newArticle.coverPic += ".png";
+            }
+            if (file.mimetype == "image/gif") {
+                newArticle.coverPic += ".gif";
+            }
+        }
 
         // 存入数据库
         newArticle.save().then(article => {
@@ -85,5 +105,54 @@ router.post('/', passport.authenticate('jwt', { session: false }), upload.single
     })
 })
 
+/**
+ * 根据id获取文章列表
+ * @json
+ *  - code: 信息码
+ *  - data：数据
+ *  - messgae：提示信息
+ * 
+ * 接受的必要参数
+ * @id 用户id
+ */
+router.get('/:id', (req, res) => {
+    User.findOne({
+        _id: req.params.id
+    }).then((user) => {
+        if (!user) {
+            return res.json({
+                code: '-1',
+                message: '用户信息不存在'
+            })
+        }
+
+        Article.find({
+            createUserId: req.params.id
+        }).then((articles) => {
+            if (!articles) {
+                return res.json({
+                    code: '0',
+                    data: {},
+                    message: '当前无文章'
+                })
+            } else {
+                return res.json({
+                    code: '0',
+                    data: articles,
+                    message: 'getData successful'
+                })
+            }
+
+        })
+    })
+})
+
+/**
+ *  获取封面图图片
+ */
+router.get('/images/articleCover/:id', (req, res) => {
+    let abcPath = path.join(__dirname, '../../')
+    res.sendFile(abcPath + "/images/articleCover/" + req.params.id)
+})
 
 module.exports = router
