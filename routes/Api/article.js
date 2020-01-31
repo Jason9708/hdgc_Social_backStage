@@ -148,6 +148,64 @@ router.get('/:id', (req, res) => {
 })
 
 /**
+ * 根据id获取文章详情
+ * @json
+ *  - code: 信息码
+ *  - data：数据
+ *  - messgae：提示信息
+ * 
+ * 接受的必要参数
+ * @id 文章id
+ */
+router.get('/articleInfo/:id', (req, res) => {
+    Article.findOne({
+        _id: req.params.id
+    }).then((article) => {
+        if (!article) {
+            return res.json({
+                code: '-1',
+                message: '当前无文章'
+            })
+        } else {
+            return res.json({
+                code: '0',
+                data: article,
+                message: 'getData successful'
+            })
+        }
+
+    })
+})
+
+/**
+ * 根据id删除文章
+ * @json
+ *  - code: 信息码
+ *  - data：数据
+ *  - messgae：提示信息
+ * 
+ * 接受的必要参数
+ * @id 文章id
+ */
+router.delete('/:id', (req, res) => {
+    Article.findOneAndRemove({
+        _id: req.params.id
+    }, function(err, article) {
+        if (err) {
+            return res.json({
+                code: '-1',
+                message: err
+            })
+        } else {
+            return res.json({
+                code: '0',
+                message: 'deleteData successful'
+            })
+        }
+    })
+})
+
+/**
  *  获取封面图图片
  */
 router.get('/images/articleCover/:id', (req, res) => {
