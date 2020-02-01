@@ -4,6 +4,7 @@ const fs = require('fs')
 const path = require('path')
 const multer = require('multer')
 const upload = multer({ dest: 'images/articleCover' }) //设置上传的目录文件夹
+const uploadMarkdownPic = multer({ dest: 'images/markdownPic' })
 const passport = require('passport') // 解析token
 const User = require('../../models/User') // 引入数据模型
 const Article = require('../../models/Article') // 引入数据模型
@@ -104,6 +105,74 @@ router.post('/', passport.authenticate('jwt', { session: false }), upload.single
 
     })
 })
+
+/**
+ * 用户发布文章时图片上传
+ * @json
+ *  - code: 信息码
+ *  - data：数据
+ *  - messgae：提示信息
+ * 
+ * 接受的必要参数
+ * @file
+ */
+router.post('/markdownPic', passport.authenticate('jwt', { session: false }), uploadMarkdownPic.single('file'), (req, res) => {
+    console.log(req.file)
+    console.log(req.body)
+
+    User.findOne({
+        username: req.user.username
+    }).then((user) => {
+        if (!user) {
+            return res.json({
+                code: '-1',
+                message: '用户信息不存在'
+            })
+        }
+
+
+        // 封面图存在 存入服务器
+        if (req.file) {
+            let file = req.file;
+            // fieldname: 上传文件标签在表单中的name
+            var filename = "images/markdownPic/" + file.filename;
+            // 判断上传的图片格式
+            // mimetype：该文件的Mime type
+            if (file.mimetype == "image/jpeg") {
+                filename += ".jpg";
+            }
+            if (file.mimetype == "image/png") {
+                filename += ".png";
+            }
+            if (file.mimetype == "image/gif") {
+                filename += ".gif";
+            }
+            fs.renameSync(file.path, filename);
+        }
+
+        if (req.file) {
+            let filePath = req.file.filename;
+            // 判断上传的图片格式
+            // mimetype：该文件的Mime type
+            if (req.file.mimetype == "image/jpeg") {
+                filePath += ".jpg";
+            }
+            if (req.file.mimetype == "image/png") {
+                filePath += ".png";
+            }
+            if (req.file.mimetype == "image/gif") {
+                filePath += ".gif";
+            }
+
+            res.json({
+                code: '0',
+                data: filePath,
+                message: 'markdownPicUpload successful'
+            })
+        }
+    })
+})
+
 
 /**
  * 根据id获取文章列表
@@ -211,6 +280,14 @@ router.delete('/:id', (req, res) => {
 router.get('/images/articleCover/:id', (req, res) => {
     let abcPath = path.join(__dirname, '../../')
     res.sendFile(abcPath + "/images/articleCover/" + req.params.id)
+})
+
+/**
+ *  获取文章图片
+ */
+router.get('/images/markdownPic/:id', (req, res) => {
+    let abcPath = path.join(__dirname, '../../')
+    res.sendFile(abcPath + "/images/markdownPic/" + req.params.id)
 })
 
 module.exports = router
