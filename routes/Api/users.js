@@ -197,4 +197,33 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
         })
     })
 })
+
+/**
+ * 查询用户信息
+ * @get 查询用户信息
+ * @json
+ *  - code: 信息码
+ *  - data：数据
+ *  - messgae：提示信息
+ */
+router.get('/:id', (req, res) => {
+    User.findOne({
+        _id: req.params.id
+    }).then((user) => {
+        if (!user) {
+            return res.json({
+                code: '-1',
+                message: '用户信息不存在'
+            })
+        }
+        user.password = '******' // user 为 passport 执行 done() 所传入的信息，注意password不能明文出现
+        res.json({
+            code: '0',
+            data: user,
+            message: 'success'
+        })
+    })
+})
+
+
 module.exports = router
