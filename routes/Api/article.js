@@ -173,9 +173,38 @@ router.post('/markdownPic', passport.authenticate('jwt', { session: false }), up
     })
 })
 
+/**
+ * 获取所有文章列表
+ * @json
+ *  - code: 信息码
+ *  - data：数据
+ *  - messgae：提示信息
+ * 
+ * 接受的必要参数
+ * @id 用户id
+ */
+router.get('/', (req, res) => {
+    Article.find({}).then((articles) => {
+        if (!articles) {
+            return res.json({
+                code: '0',
+                data: [],
+                message: '当前无文章'
+            })
+        } else {
+            return res.json({
+                code: '0',
+                data: articles,
+                message: 'getData successful'
+            })
+        }
+
+    })
+})
+
 
 /**
- * 根据id获取文章列表
+ * 根据用户id获取文章列表
  * @json
  *  - code: 信息码
  *  - data：数据
@@ -201,7 +230,7 @@ router.get('/:id', (req, res) => {
             if (!articles) {
                 return res.json({
                     code: '0',
-                    data: {},
+                    data: [],
                     message: '当前无文章'
                 })
             } else {
@@ -213,6 +242,67 @@ router.get('/:id', (req, res) => {
             }
 
         })
+    })
+})
+
+/**
+ * 根据 用户id + 文章type 获取文章列表
+ * @json
+ *  - code: 信息码
+ *  - data：数据
+ *  - messgae：提示信息
+ * 
+ * 接受的必要参数
+ * @id 用户id
+ */
+router.get('/getArticleListByIdAndType/:id/:type', (req, res) => {
+    User.findOne({
+        _id: req.params.id
+    }).then((user) => {
+        if (!user) {
+            return res.json({
+                code: '-1',
+                message: '用户信息不存在'
+            })
+        }
+        if (req.params.type == 0) {
+            Article.find({
+                createUserId: req.params.id
+            }).then((articles) => {
+                if (!articles) {
+                    return res.json({
+                        code: '0',
+                        data: [],
+                        message: '当前无文章'
+                    })
+                } else {
+                    return res.json({
+                        code: '0',
+                        data: articles,
+                        message: 'getData successful'
+                    })
+                }
+            })
+        } else {
+            Article.find({
+                createUserId: req.params.id,
+                classification: req.params.type
+            }).then((articles) => {
+                if (!articles) {
+                    return res.json({
+                        code: '0',
+                        data: [],
+                        message: '当前无文章'
+                    })
+                } else {
+                    return res.json({
+                        code: '0',
+                        data: articles,
+                        message: 'getData successful'
+                    })
+                }
+            })
+        }
     })
 })
 

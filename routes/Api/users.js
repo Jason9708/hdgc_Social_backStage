@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs') // 加密插件
 const jsonwebtoken = require('jsonwebtoken') // 生成 token
 const passport = require('passport') // 解析token
 const User = require('../../models/User') // 引入数据模型
+const Follow = require('../../models/Follow') // 引入数据模型
 
 /**
  * @test 测试用例
@@ -53,14 +54,20 @@ router.post('/register', (req, res) => {
                         return
                     }
                     newUser.password = hash
-
-                    // 存入数据库
+                        // 存入数据库
                     newUser.save().then(user => {
                         res.json({
                             code: '0',
                             data: user,
                             message: 'register successful'
                         })
+
+                        // 创建follow表数据
+                        const newFollow = new Follow({
+                            _id: user._id
+                        })
+
+                        newFollow.save()
                     }).catch(err => {
                         // 异常捕获
                         res.json({
