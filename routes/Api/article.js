@@ -179,9 +179,6 @@ router.post('/markdownPic', passport.authenticate('jwt', { session: false }), up
  *  - code: 信息码
  *  - data：数据
  *  - messgae：提示信息
- * 
- * 接受的必要参数
- * @id 用户id
  */
 router.get('/', (req, res) => {
     Article.find({}).then((articles) => {
@@ -195,6 +192,35 @@ router.get('/', (req, res) => {
             return res.json({
                 code: '0',
                 data: articles,
+                message: 'getData successful'
+            })
+        }
+
+    })
+})
+
+/**
+ * 获取所有文章列表
+ * @json
+ *  - code: 信息码
+ *  - data：数据
+ *  - messgae：提示信息
+ */
+router.get('/getHotArticle', (req, res) => {
+    Article.find({}).sort({ 'like': -1 }).then((articles) => {
+        if (!articles) {
+            return res.json({
+                code: '0',
+                data: [],
+                message: '当前无文章'
+            })
+        } else {
+
+            let topFiveArticle = []
+            topFiveArticle = articles.slice(0, 5)
+            return res.json({
+                code: '0',
+                data: topFiveArticle,
                 message: 'getData successful'
             })
         }
