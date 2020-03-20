@@ -25,8 +25,6 @@ const Article = require('../../models/Article') // 引入数据模型
  * @mood 心情
  */
 router.post('/', passport.authenticate('jwt', { session: false }), upload.single('file'), (req, res) => {
-    console.log(req.file)
-    console.log(req.body)
 
     User.findOne({
         username: req.user.username
