@@ -125,6 +125,34 @@ router.get('/', (req, res) => {
 })
 
 /**
+ * 根据id删除动态
+ * @json
+ *  - code: 信息码
+ *  - data：数据
+ *  - messgae：提示信息
+ * 
+ * 接受的必要参数
+ * @id 动态id
+ */
+router.delete('/:id', (req, res) => {
+    Dynamic.findOneAndRemove({
+        _id: req.params.id
+    }, function(err, dynamic) {
+        if (err) {
+            return res.json({
+                code: '-1',
+                message: err
+            })
+        } else {
+            return res.json({
+                code: '0',
+                message: 'deleteData successful'
+            })
+        }
+    })
+})
+
+/**
  *  获取动态附图
  */
 router.get('/images/dynamicPic/:id', (req, res) => {
