@@ -53,4 +53,4 @@ const dynamic_schema = new Schema({
 })
 
 
-module.exports = Dynamic = mongoose.model("dynamic", dynamic_schema);
+module.exports = Dynamic = mongoose.model("dynamics", dynamic_schema);
