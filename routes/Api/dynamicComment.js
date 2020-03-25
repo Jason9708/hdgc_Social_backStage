@@ -29,7 +29,6 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
             name: req.user.nickname != '' ? req.user.nickname : req.user.username,
             avatar: req.user.avatar,
         })
-        console.log(newComment)
         newComment.save().then(comment => {
             res.json({
                 code: '0',
