@@ -69,6 +69,41 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
 
                 dynamicLike.save().then(dynamicLike => {
                     Dynamic.findOneAndUpdate({ _id: req.body.id }, { like: dynamicLike.likes.length }, { new: true }).then(dynamic => {
+
+                        // 发送通知
+                        Notice.findOne({
+                            user_id: dynamic.createUserId
+                        }).then(notice => {
+                            if (!notice) {
+                                const newNotice = new Notice({
+                                    user_id: dynamic.createUserId,
+                                    NoticeList: [{
+                                        userId: req.user._id,
+                                        userName: req.user.nickname != '' ? req.user.nickname : req.user.username,
+                                        userAvatar: req.user.avatar,
+                                        type: '5', // 1 - 文章评论， 2 - 文章点赞，3 - 文章子评论， 4 - 动态评论， 5 - 动态点赞， 6 - 动态子评论， 7 - 关注
+                                        info: dynamic,
+                                    }]
+                                })
+
+                                newNotice.save().then(new_notice => {
+                                    console.log('更新通知：', new_notice)
+                                })
+                            } else {
+                                notice.NoticeList.push({
+                                    userId: req.user._id,
+                                    userName: req.user.nickname != '' ? req.user.nickname : req.user.username,
+                                    userAvatar: req.user.avatar,
+                                    type: '5', // 1 - 文章评论， 2 - 文章点赞，3 - 文章子评论， 4 - 动态评论， 5 - 动态点赞， 6 - 动态子评论， 7 - 关注
+                                    info: dynamic,
+                                })
+
+                                notice.save().then(new_notice => {
+                                    console.log('更新通知：', new_notice)
+                                })
+                            }
+                        })
+
                         res.json({
                             code: '0',
                             data: dynamic,

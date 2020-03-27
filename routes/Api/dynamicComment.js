@@ -13,7 +13,7 @@ const DynamicComment = require('../../models/DynamicComment')
  *  - messgae：提示信息
  */
 router.post('/', passport.authenticate('jwt', { session: false }), (req, res) => {
-    Dynamic.find({
+    Dynamic.findOne({
         _id: req.body.id
     }).then(dynamic => {
         if (!dynamic) {
@@ -30,6 +30,43 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
             avatar: req.user.avatar,
         })
         newComment.save().then(comment => {
+
+            // 发送通知
+            Notice.findOne({
+                user_id: dynamic.createUserId
+            }).then(notice => {
+                if (!notice) {
+                    const newNotice = new Notice({
+                        user_id: dynamic.createUserId,
+                        NoticeList: [{
+                            userId: req.user._id,
+                            userName: req.user.nickname != '' ? req.user.nickname : req.user.username,
+                            userAvatar: req.user.avatar,
+                            type: '4', // 1 - 文章评论， 2 - 文章点赞，3 - 文章子评论， 4 - 动态评论， 5 - 动态点赞， 6 - 动态子评论， 7 - 关注
+                            info: dynamic,
+                            content: req.body.text
+                        }]
+                    })
+
+                    newNotice.save().then(new_notice => {
+                        console.log('更新通知：', new_notice)
+                    })
+                } else {
+                    notice.NoticeList.push({
+                        userId: req.user._id,
+                        userName: req.user.nickname != '' ? req.user.nickname : req.user.username,
+                        userAvatar: req.user.avatar,
+                        type: '4', // 1 - 文章评论， 2 - 文章点赞，3 - 文章子评论， 4 - 动态评论， 5 - 动态点赞， 6 - 动态子评论， 7 - 关注
+                        info: dynamic,
+                        content: req.body.text
+                    })
+
+                    notice.save().then(new_notice => {
+                        console.log('更新通知：', new_notice)
+                    })
+                }
+            })
+
             res.json({
                 code: '0',
                 data: comment,
@@ -97,7 +134,7 @@ router.post('/comment/:id', passport.authenticate('jwt', { session: false }), (r
             }
 
             const newComment = {
-                user: req.user.id,
+                user: req.user._id,
                 text: req.body.text,
                 name: req.user.nickname != '' ? req.user.nickname : req.user.username,
                 avatar: req.user.avatar,
@@ -109,6 +146,43 @@ router.post('/comment/:id', passport.authenticate('jwt', { session: false }), (r
             comment.comments.push(newComment) // 添加子评论
 
             comment.save().then(comment => {
+
+                // 发送通知
+                Notice.findOne({
+                    user_id: req.body.replyerId
+                }).then(notice => {
+                    if (!notice) {
+                        const newNotice = new Notice({
+                            user_id: req.body.replyerId,
+                            NoticeList: [{
+                                userId: req.user._id,
+                                userName: req.user.nickname != '' ? req.user.nickname : req.user.username,
+                                userAvatar: req.user.avatar,
+                                type: '6', // 1 - 文章评论， 2 - 文章点赞，3 - 文章子评论， 4 - 动态评论， 5 - 动态点赞， 6 - 动态子评论， 7 - 关注
+                                info: newComment,
+                                content: req.body.text
+                            }]
+                        })
+
+                        newNotice.save().then(new_notice => {
+                            console.log('更新通知：', new_notice)
+                        })
+                    } else {
+                        notice.NoticeList.push({
+                            userId: req.user._id,
+                            userName: req.user.nickname != '' ? req.user.nickname : req.user.username,
+                            userAvatar: req.user.avatar,
+                            type: '6', // 1 - 文章评论， 2 - 文章点赞，3 - 文章子评论， 4 - 动态评论， 5 - 动态点赞， 6 - 动态子评论， 7 - 关注
+                            info: newComment,
+                            content: req.body.text
+                        })
+
+                        notice.save().then(new_notice => {
+                            console.log('更新通知：', new_notice)
+                        })
+                    }
+                })
+
                 res.json({
                     code: '0',
                     data: comment,

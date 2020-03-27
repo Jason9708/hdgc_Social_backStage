@@ -63,6 +63,39 @@ router.post('/follow', (req, res) => {
 
                         noticer.push(user)
                         Follow.findOneAndUpdate({ _id: req.body.followId }, { noticer: noticer }, { new: true }).then(newFollow => {
+
+                            // 发送通知
+                            Notice.findOne({
+                                user_id: req.body.followId
+                            }).then(notice => {
+                                if (!notice) {
+                                    const newNotice = new Notice({
+                                        user_id: req.body.followId,
+                                        NoticeList: [{
+                                            userId: user._id,
+                                            userName: user.nickname != '' ? user.nickname : user.username,
+                                            userAvatar: user.avatar,
+                                            type: '7', // 1 - 文章评论， 2 - 文章点赞，3 - 文章子评论， 4 - 动态评论， 5 - 动态点赞， 6 - 动态子评论， 7 - 关注
+                                        }]
+                                    })
+
+                                    newNotice.save().then(new_notice => {
+                                        console.log('更新通知：', new_notice)
+                                    })
+                                } else {
+                                    notice.NoticeList.push({
+                                        userId: user._id,
+                                        userName: user.nickname != '' ? user.nickname : user.username,
+                                        userAvatar: user.avatar,
+                                        type: '7', // 1 - 文章评论， 2 - 文章点赞，3 - 文章子评论， 4 - 动态评论， 5 - 动态点赞， 6 - 动态子评论， 7 - 关注
+                                    })
+
+                                    notice.save().then(new_notice => {
+                                        console.log('更新通知：', new_notice)
+                                    })
+                                }
+                            })
+
                             resolve()
                         })
                     }

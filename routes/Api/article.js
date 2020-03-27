@@ -179,7 +179,7 @@ router.post('/markdownPic', passport.authenticate('jwt', { session: false }), up
  *  - messgae：提示信息
  */
 router.get('/', (req, res) => {
-    Article.find({}).then((articles) => {
+    Article.find({}).sort({ 'date': -1 }).then((articles) => {
         if (!articles) {
             return res.json({
                 code: '0',
@@ -240,7 +240,7 @@ router.get('/getHotArticle', (req, res) => {
 router.get('/:id', (req, res) => {
     User.findOne({
         _id: req.params.id
-    }).then((user) => {
+    }).sort({ 'date': -1 }).then((user) => {
         if (!user) {
             return res.json({
                 code: '-1',
@@ -282,7 +282,7 @@ router.get('/:id', (req, res) => {
 router.get('/getArticleListByIdAndType/:id/:type', (req, res) => {
     User.findOne({
         _id: req.params.id
-    }).then((user) => {
+    }).sort({ 'date': -1 }).then((user) => {
         if (!user) {
             return res.json({
                 code: '-1',

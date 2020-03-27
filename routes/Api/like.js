@@ -4,6 +4,7 @@ const passport = require('passport') // 解析token
 const User = require('../../models/User') // 引入数据模型
 const Article = require('../../models/Article') // 引入数据模型
 const Like = require('../../models/Like')
+const Notice = require('../../models/Notice')
 
 
 /**
@@ -70,6 +71,41 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
 
                 like.save().then(like => {
                     Article.findOneAndUpdate({ _id: req.body.id }, { like: like.likes.length }, { new: true }).then(user => {
+
+                        // 发送通知
+                        Notice.findOne({
+                            user_id: article.createUserId
+                        }).then(notice => {
+                            if (!notice) {
+                                const newNotice = new Notice({
+                                    user_id: article.createUserId,
+                                    NoticeList: [{
+                                        userId: req.user._id,
+                                        userName: req.user.nickname != '' ? req.user.nickname : req.user.username,
+                                        userAvatar: req.user.avatar,
+                                        type: '2', // 1 - 文章评论， 2 - 文章点赞，3 - 文章子评论， 4 - 动态评论， 5 - 动态点赞， 6 - 动态子评论， 7 - 关注
+                                        info: article,
+                                    }]
+                                })
+
+                                newNotice.save().then(new_notice => {
+                                    console.log('更新通知：', new_notice)
+                                })
+                            } else {
+                                notice.NoticeList.push({
+                                    userId: req.user._id,
+                                    userName: req.user.nickname != '' ? req.user.nickname : req.user.username,
+                                    userAvatar: req.user.avatar,
+                                    type: '2', // 1 - 文章评论， 2 - 文章点赞，3 - 文章子评论， 4 - 动态评论， 5 - 动态点赞， 6 - 动态子评论， 7 - 关注
+                                    info: article,
+                                })
+
+                                notice.save().then(new_notice => {
+                                    console.log('更新通知：', new_notice)
+                                })
+                            }
+                        })
+
                         res.json({
                             code: '0',
                             data: like,

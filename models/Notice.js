@@ -20,15 +20,15 @@ const notice_schema = new Schema({
             type: String,
             default: ''
         },
-        type: {
+        type: { // 1 - 文章评论， 2 - 文章点赞，3 - 文章子评论， 4 - 动态评论， 5 - 动态点赞， 6 - 动态子评论， 6 - 关注
             type: String,
             default: ''
         },
-        articleInfo: {
+        info: {
             type: Object
         },
-        dynamicInfo: {
-            type: Object
+        content: {
+            type: String,
         },
         date: {
             type: Date,
