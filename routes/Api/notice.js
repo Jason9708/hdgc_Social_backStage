@@ -12,7 +12,7 @@ const Notice = require('../../models/Notice') // 引入数据模型
  *  - data：数据
  *  - messgae：提示信息
  */
-router.get('/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => {
     User.findOne({
         username: req.user.username
     }).then((user) => {
@@ -23,7 +23,7 @@ router.get('/:id', passport.authenticate('jwt', { session: false }), (req, res) 
             })
         }
 
-        Notice.find({
+        Notice.findOne({
             user_id: req.user._id
         }).then(notice => {
             if (!notice) {
@@ -43,9 +43,9 @@ router.get('/:id', passport.authenticate('jwt', { session: false }), (req, res) 
                 message: 'getNotice successful'
             })
 
-            Notice.findAndUpdate({ user_id: req.user._id }, { noticeList: [] }, { new: true }).then(notice => {
-                // do nothing...
-            })
+            // Notice.findAndUpdate({ user_id: req.user._id }, { noticeList: [] }, { new: true }).then(notice => {
+            //     // do nothing...
+            // })
         })
     })
 })
